@@ -1,0 +1,50 @@
+import pandas as pd
+import numpy as np
+
+# Crear el dataset
+data = {
+    'Actor': ['Robert Downey Jr.', 'Chris Hemsworth', 'Mark Ruffalo', 'Chris Evans', 
+              'Scarlett Johansson', 'Josh Brolin', 'Tom Hiddleston', 'Zoe Saldana',
+              'Benedict Cumberbatch', 'Chadwick Boseman', 'Paul Bettany'],
+    'Altura (cm)': [174, 190, 173, 183, 160, 178, 188, 170, 183, 183, 192],
+    'Peso (kg)': [78, 91, 75, 85, 57, 84, 79, 54, 78, 85, 79],
+    'Talla (EU)': [42, 46, 42, 44, 38, 44, 44, 36, 42, 44, 46],
+    'Clase': ['Héroe', 'Héroe', 'Héroe', 'Héroe', 'Héroe', 'Villano', 'Villano', 
+              'Héroe', 'Héroe', 'Héroe', 'Héroe']
+}
+
+df = pd.DataFrame(data)
+
+# Función para calcular la entropía
+def calcular_entropia(columna):
+    clases = df[columna].value_counts(normalize=True)
+    entropia = -sum(clases * np.log2(clases))
+    return entropia
+
+# Entropía del dataset original
+entropia_total = calcular_entropia('Clase')
+print(f'Entropía total: {entropia_total}')
+
+# Función para calcular la ganancia de información de una característica
+def ganancia_informacion(caracteristica):
+    valores = df[caracteristica].unique()
+    entropia_condicional = 0
+    
+    # Calcular la entropía ponderada para cada valor único de la característica
+    for valor in valores:
+        subgrupo = df[df[caracteristica] == valor]
+        entropia_cond = calcular_entropia('Clase')
+        entropia_condicional += (len(subgrupo) / len(df)) * entropia_cond
+    
+    # Ganancia de información
+    ganancia = entropia_total - entropia_condicional
+    return ganancia
+
+# Calcular la ganancia de información para cada característica
+ganancia_altura = ganancia_informacion('Altura (cm)')
+ganancia_peso = ganancia_informacion('Peso (kg)')
+ganancia_talla = ganancia_informacion('Talla (EU)')
+
+print(f'Ganancia de información (Altura): {ganancia_altura}')
+print(f'Ganancia de información (Peso): {ganancia_peso}')
+print(f'Ganancia de información (Talla): {ganancia_talla}')
